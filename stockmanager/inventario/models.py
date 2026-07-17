@@ -55,5 +55,44 @@ class Usuario(models.Model):
         db_table = 'usuarios'
     def __str__(self):
         return self.username
+    
+class Producto(models.Model):
+    codigo_sku = models.CharField(max_length=50, unique=True)
+    nombre = models.CharField(max_length=150)
+    categoria =models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    proveedor =models.ForeignKey(Proveedor, on_delete=models.CASCADE)
+    precio_compra = models.DecimalField(max_digits=10, decimal_places=2)
+    precio_venta = models.DecimalField(max_digits=10, decimal_places=2)
+    stock_actual = models.IntegerField(default=0)
+    stock_minimo = models.IntegerField(default=10)
+    stock_maximo     = models.IntegerField(default=100)
+    peso = models.DecimalField(max_digits=8, decimal_places=3, blank=True, null=True)
+    activo = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
 
-class Producto
+    class Meta:
+        db_table = 'productos'
+
+    def __str__(self):
+        return self.nombre
+
+class OrdenCompra(models.Model):
+    class EstadoChoices(models.TextChoices):
+        PENDIENTE = 'pendiente', 'Pendiente'
+        RECIBIDA = 'recibida', 'Recibida'
+        PARCIAL = 'parcial', 'Parcial'
+        CANCELADA = 'cancelada', 'Cancelada'
+
+    numero_orden = models.CharField(max_length=50, unique= True)
+    proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE)
+    fecha_orden = models.DateTimeField(auto_now_add=True)
+    fecha_entrega_esperada = models.DateField(blank=True, null=True)
+    estado = models.CharField(max_length=20, choices=EstadoChoices.choices, default=EstadoChoices.PENDIENTE)
+    total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    notas = models.TextField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'ordenes_compra'
+    def __str__(self):
+        return self.numero_orden
