@@ -1,0 +1,134 @@
+USUARIOS
+├── id (PK)
+├── username (UNIQUE)
+├── email
+├── password_hash
+├── rol (admin/vendedor/gerente)
+└── activo
+
+CLIENTES
+├── id (PK)
+├── nombre
+├── nit/identificación
+├── email
+├── teléfono
+├── dirección
+└── tipo (minorista/mayorista)
+
+CATEGORIAS
+├── id (PK)
+├── nombre (UNIQUE)
+└── descripción
+
+PROVEEDORES
+├── id (PK)
+├── nombre (UNIQUE)
+├── contacto
+├── email
+├── teléfono
+├── términos_pago (días crédito)
+└── activo
+
+PRODUCTOS
+├── id (PK)
+├── código_sku (UNIQUE)
+├── nombre
+├── categoría_id (FK → CATEGORIAS)
+├── proveedor_id (FK → PROVEEDORES)
+├── precio_compra
+├── precio_venta
+├── margen_ganancia (%)
+├── stock_actual
+├── stock_mínimo
+├── stock_máximo
+├── peso (kg)
+├── activo
+└── fecha_creación
+
+HISTORIAL_PRECIOS
+├── id (PK)
+├── producto_id (FK → PRODUCTOS)
+├── precio_anterior
+├── precio_nuevo
+├── fecha_cambio
+└── usuario_id (FK → USUARIOS)
+
+ORDENES_COMPRA (a proveedores)
+├── id (PK)
+├── número_orden (UNIQUE)
+├── proveedor_id (FK → PROVEEDORES)
+├── fecha_orden
+├── fecha_entrega_esperada
+├── estado (pendiente/recibida/parcial)
+├── total
+├── usuario_id (FK → USUARIOS)
+└── notas
+
+DETALLES_ORDEN_COMPRA
+├── id (PK)
+├── orden_compra_id (FK → ORDENES_COMPRA)
+├── producto_id (FK → PRODUCTOS)
+├── cantidad_solicitada
+├── cantidad_recibida
+├── precio_unitario
+└── subtotal
+
+FACTURAS_VENTA
+├── id (PK)
+├── número_factura (UNIQUE)
+├── cliente_id (FK → CLIENTES)
+├── fecha
+├── fecha_vencimiento
+├── estado (pagada/pendiente/vencida)
+├── total
+├── impuesto (IVA u otro)
+├── usuario_id (FK → USUARIOS)
+└── notas
+
+DETALLES_FACTURA
+├── id (PK)
+├── factura_id (FK → FACTURAS_VENTA)
+├── producto_id (FK → PRODUCTOS)
+├── cantidad
+├── precio_unitario
+├── descuento (%)
+└── subtotal
+
+DEVOLUCIONES
+├── id (PK)
+├── factura_id (FK → FACTURAS_VENTA)
+├── producto_id (FK → PRODUCTOS)
+├── cantidad
+├── motivo (defecto/cambio/cliente)
+├── estado (pendiente/procesada)
+├── fecha
+└── usuario_id (FK → USUARIOS)
+
+MOVIMIENTOS_INVENTARIO (auditoría general)
+├── id (PK)
+├── producto_id (FK → PRODUCTOS)
+├── tipo (entrada/salida/ajuste/devolución)
+├── cantidad
+├── stock_anterior
+├── stock_posterior
+├── referencia (orden_compra_id / factura_id / etc)
+├── motivo
+├── fecha
+└── usuario_id (FK → USUARIOS)
+
+ALERTAS_STOCK
+├── id (PK)
+├── producto_id (FK → PRODUCTOS)
+├── tipo_alerta (stock_bajo/sin_stock/sobre_stock)
+├── fecha_alerta
+├── resuelta (boolean)
+├── fecha_resolución (nullable)
+└── notas
+
+GASTOS_OPERACIONALES
+├── id (PK)
+├── categoria (arriendo/servicios/publicidad/mantenimiento)
+├── descripción
+├── monto
+├── fecha
+└── usuario_id (FK → USUARIOS)
