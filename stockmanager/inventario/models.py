@@ -27,7 +27,7 @@ class Cliente(models.Model):
         MAYORISTA = 'mayorista', 'Mayorista'
 
     nombre = models.CharField(max_length=150)
-    nit = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    nif = models.CharField(max_length=50, unique=True, null=True, blank=True)
     email = models.EmailField(blank=True, null=True)
     telefono = models.CharField(max_length=20, blank=True, null=True)
     direccion = models.TextField(blank=True, null=True)
