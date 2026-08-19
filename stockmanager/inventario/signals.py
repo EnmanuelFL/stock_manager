@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.db import transaction
-from .models import DetalleFactura, Producto, MovimientoInventario, DetalleOrdenCompra
+from .models import DetalleFactura, Devolucion, MovimientoInventario, DetalleOrdenCompra
 
 @transaction.atomic
 @receiver(post_save, sender=DetalleFactura)
@@ -46,7 +46,7 @@ def actualizar_stock_por_compra(sender, instance, **kwargs):
     stock_anterior = producto.stock_actual        
     producto.stock_actual += diferencia  # Suma si es positivo, resta si es negativo
     producto.save()   
-    tipo_movimiento = "entrada" if diferencia > 0 else "ajuste_salida"
+    tipo_movimiento = "entrada" if diferencia > 0 else "salida"
     MovimientoInventario.objects.create(
         producto=producto,
         tipo=tipo_movimiento,
@@ -57,3 +57,33 @@ def actualizar_stock_por_compra(sender, instance, **kwargs):
         motivo='Ajuste de recepción de compra',
         usuario=instance.orden_compra.usuario
     )
+
+# DEVOLUCION
+@receiver(pre_save, sender=Devolucion)
+def guardar_estado_anterior(sender, instance, **kwargs):
+    if instance.pk:
+        try:
+            anterior = Devolucion.objects.get(pk=instance.pk)
+            instance._estado_anterior = anterior.estado
+        except Devolucion.DoesNotExist:
+            instance._estado_anterior = None
+@receiver(post_save, sender=Devolucion)
+def procesar_devolucion(sender, instance, **kwargs):
+    estado_anterior = getattr(sender, '_estado_anterior', None)
+    if estado_anterior != "procesada" and instance.estado == "procesada":
+            producto = instance.producto
+            stock_anterior = producto.stock_actual
+            producto.stock_actual += instance.cantidad
+            producto.save()
+            tipo_movimiento = "devolucion"
+            MovimientoInventario.objects.create(
+                producto=producto,
+                tipo=tipo_movimiento,
+                cantidad=abs(instance.cantidad),  
+                stock_anterior=stock_anterior,
+                stock_posterior=producto.stock_actual,
+                referencia=instance.factura.numero_factura,  
+                motivo=f'devolucion de producto{instance.motivo}',
+                usuario=instance.usuario
+            )
+    
