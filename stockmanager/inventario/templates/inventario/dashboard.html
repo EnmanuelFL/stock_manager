@@ -1,0 +1,22 @@
+{% extends 'inventario/base.html' %}
+
+{% block content %}
+<div class="card_productos">
+    <div class="total_productos">
+        <h5>Total Productos</h5>
+        <h2>{{ total_productos }}</h2>
+    </div>
+</div>
+<div class="card_stock_bajo">
+     <div class="productos_stock_bajo">
+        <h5>Productos stock bajo</h5>
+        <h2>{{ productos_bajo_stock }}</h2>
+    </div>
+</div>
+<div class="card_alertas_sin_resolver">
+     <div class="alertas_sin_resolver">
+        <h5>Alertas sin resolver</h5>
+        <h2>{{ alertas_sin_resolver }}</h2>
+    </div>
+</div>
+{% endblock %}
