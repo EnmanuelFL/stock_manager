@@ -1,0 +1,9 @@
+{% extends 'inventario/base.html' %}
+{% block content %}
+<form method="POST">
+    {% csrf_token %}
+    {{ factura_form.as_p }}
+    {{ detalle_form.as_p }}
+    <button>Submit</button>
+</form>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'inventario/base.html' %}
+{% block content %}
+<table class="facturas">
+    {% for factura in facturas %}
+    <tr>
+        <td>{{factura.numero_factura}}</td>
+        <td>{{factura.cliente}}</td>
+        <td>{{factura.fecha}}</td>
+        <td>{{factura.estado}}</td>
+        <td>{{factura.total}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
