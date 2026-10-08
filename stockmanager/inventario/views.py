@@ -1,12 +1,13 @@
-# Create your views here.
-from django.shortcuts import render
-from .models import Producto, AlertaStock, FacturaVenta
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import F
-from django.shortcuts import render, redirect
-from .forms import ProductoForm
-from django.shortcuts import get_object_or_404
-from .models import Producto, AlertaStock, FacturaVenta, Usuario
-from .forms import ProductoForm, FacturaVentaForm, DetalleFacturaForm
+from .models import Producto, AlertaStock, FacturaVenta, Usuario, OrdenCompra, DetalleOrdenCompra
+from .forms import (
+    ProductoForm,
+    FacturaVentaForm,
+    DetalleFacturaForm,
+    OrdenCompraForm,
+    DetalleOrdenCompraForm,
+)
 
 def dashboard(request):
     contexto = {
@@ -76,3 +77,27 @@ def crear_venta(request):
 def lista_ventas(request):
     facturas = FacturaVenta.objects.all()
     return render(request, 'inventario/ventas/lista.html', {'facturas': facturas})
+
+def crear_compra(request):
+    if request.method == 'POST':
+        compra_form = OrdenCompraForm(request.POST)
+        detalle_compra_form = DetalleOrdenCompraForm(request.POST)
+        if compra_form.is_valid() and detalle_compra_form.is_valid():
+            compra = compra_form.save(commit=False)
+            compra.usuario = Usuario.objects.first()
+            compra.save()
+            detalle_compra = detalle_compra_form.save(commit=False)
+            detalle_compra.orden_compra = compra
+            detalle_compra.save()
+            return redirect('lista_compras')
+    else:
+        compra_form = OrdenCompraForm()
+        detalle_compra_form = DetalleOrdenCompraForm()
+    return render(request, 'inventario/compras/crear.html', {
+        'compra_form': compra_form,
+        'detalle_compra': detalle_compra_form
+    })
+
+def lista_compras(request):
+    compras = OrdenCompra.objects.all()
+    return render(request, 'inventario/compras/lista.html', {'compras': compras})

@@ -1,0 +1,14 @@
+{% extends 'inventario/base.html' %}
+{% block content %}
+<table class="compras">
+    {% for compra in compras %}
+    <tr>
+        <td>{{compra.numero_orden}}</td>
+        <td>{{compra.proveedor}}</td>
+        <td>{{compra.fecha_orden}}</td>
+        <td>{{compra.estado}}</td>
+        <td>{{compra.total}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
