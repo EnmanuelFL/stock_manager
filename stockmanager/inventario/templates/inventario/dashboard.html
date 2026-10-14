@@ -19,4 +19,18 @@
         <h2>{{ alertas_sin_resolver }}</h2>
     </div>
 </div>
+<div class="card_ingresos_totales">
+    <div class="ingresos_totales">
+        <h5>Ingresos totales</h5>
+        <h2>{{ ingresos_totales }}</h2>
+    </div>
+</div>
+<div class="card_top_5">
+    <h5>Top 5 productos más vendidos</h5>
+    <ul>
+        {% for producto in top_vendidos%}
+        <li>{{producto.nombre}} : {{producto.total_vendido|default:"0"}}</li>
+        {% endfor%}
+    </ul>
+</div>
 {% endblock %}
