@@ -33,4 +33,38 @@
         {% endfor%}
     </ul>
 </div>
+<div class="card_grafico_top_productos">
+    <canvas id="graficoTop"></canvas>
+</div>
+<script>
+    const ctx = document.getElementById('graficoTop');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for producto in top_vendidos %}
+                    '{{ producto.nombre|escapejs }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Unidades Vendidas',
+                data: [
+                    {% for producto in top_vendidos %}
+                        {{ producto.total_vendido|default:0 }},
+                    {% endfor %}
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}
