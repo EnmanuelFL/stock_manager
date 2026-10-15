@@ -10,10 +10,10 @@
 </head>
 <body>
     <nav>
-        <a href="#">Dashboard</a>
+        <a href="{% url 'dashboard' %}">Dashboard</a>
         <a href="{% url 'lista_productos' %}">Productos</a>
-        <a href="#">Ventas</a>
-        <a href="#">Compras</a>
+        <a href="{% url 'lista_ventas' %}">Ventas</a>
+        <a href="{% url 'lista_compras' %}">Compras</a>
     </nav>
     <main>
         {% block content %} {% endblock %}

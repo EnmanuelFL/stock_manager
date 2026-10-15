@@ -6,7 +6,7 @@ class ProductoForm(forms.ModelForm):
         model = Producto
         fields = ['codigo_sku', 'nombre', 'categoria', 'proveedor', 
                   'precio_compra', 'precio_venta', 'stock_actual', 
-                  'stock_minimo', 'stock_maximo', 'peso', 'activo']
+                  'stock_minimo', 'stock_maximo', 'peso','unidad_peso', 'activo']
 class FacturaVentaForm(forms.ModelForm):
     class Meta:
         model = FacturaVenta

@@ -1,5 +1,11 @@
 from django.urls import path
-from . import views
+from . import views, api_views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'productos', api_views.ProductoViewSet)
+router.register(r'categorias', api_views.CategoriaViewSet)
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
@@ -11,4 +17,5 @@ urlpatterns = [
     path('ventas/crear/', views.crear_venta, name='crear_venta'),
     path('compras/', views.lista_compras, name='lista_compras'),
     path('compras/crear/', views.crear_compra, name='crear_compra'),
+    path('api/', include(router.urls)),
 ]

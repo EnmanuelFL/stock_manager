@@ -67,9 +67,22 @@ class Producto(models.Model):
     stock_minimo = models.IntegerField(default=10)
     stock_maximo     = models.IntegerField(default=100)
     peso = models.DecimalField(max_digits=8, decimal_places=3, blank=True, null=True)
+    imagen_url = models.URLField(blank=True, null=True)
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class UnidadPesoChoices(models.TextChoices):
+        GRAMOS = 'g', 'Gramos (g)'
+        KILOGRAMOS = 'kg', 'Kilogramos (kg)'
+        LIBRAS = 'lb', 'Libras (lb)'
 
+    unidad_peso = models.CharField(
+        max_length=10,
+        choices=UnidadPesoChoices.choices,
+        default=UnidadPesoChoices.KILOGRAMOS,
+        blank=True,
+        null=True
+    )
     class Meta:
         db_table = 'productos'
 
