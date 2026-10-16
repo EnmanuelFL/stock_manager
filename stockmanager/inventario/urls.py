@@ -6,6 +6,8 @@ from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 router.register(r'productos', api_views.ProductoViewSet)
 router.register(r'categorias', api_views.CategoriaViewSet)
+router.register(r'ventas', api_views.FacturaVentaViewSet)
+router.register(r'detalles_factura', api_views.DetalleFacturaViewSet)
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
