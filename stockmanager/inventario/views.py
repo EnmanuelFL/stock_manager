@@ -8,8 +8,9 @@ from .forms import (
     DetalleFacturaForm,
     OrdenCompraForm,
     DetalleOrdenCompraForm)
+from django.contrib.auth.decorators import login_required
 
-
+@login_required
 def dashboard(request):
     resultado = FacturaVenta.objects.aggregate(total_ventas = Sum('total'))
     ingresos_totales = resultado['total_ventas'] or 0
@@ -23,6 +24,7 @@ def dashboard(request):
     }
     return render(request, 'inventario/dashboard.html', contexto)
 
+@login_required
 def lista_productos(request):
     productos = Producto.objects.all()
     contexto = {
@@ -30,6 +32,7 @@ def lista_productos(request):
     }
     return render(request, 'inventario/productos/lista.html', contexto)
 
+@login_required
 def crear_producto(request):
     if request.method == 'POST':
         form = ProductoForm(request.POST )
@@ -41,6 +44,7 @@ def crear_producto(request):
         form = ProductoForm()
         return render(request, 'inventario/productos/crear.html', {'form': form})
 
+@login_required
 def editar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     if request.method == 'POST':
@@ -53,6 +57,7 @@ def editar_producto(request, pk):
         form = ProductoForm(instance=producto)
         return render(request, 'inventario/productos/editar.html', {'form': form})
 
+@login_required
 def eliminar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     if request.method == 'POST':
@@ -60,6 +65,7 @@ def eliminar_producto(request, pk):
         return redirect('lista_productos')
     return render(request, 'inventario/productos/eliminar.html', {'producto': producto})
 
+@login_required
 def crear_venta(request):
     if request.method == 'POST':
         factura_form = FacturaVentaForm(request.POST)
@@ -80,10 +86,12 @@ def crear_venta(request):
         'detalle_form': detalle_form
     })
 
+@login_required
 def lista_ventas(request):
     facturas = FacturaVenta.objects.all()
     return render(request, 'inventario/ventas/lista.html', {'facturas': facturas})
 
+@login_required
 def crear_compra(request):
     if request.method == 'POST':
         compra_form = OrdenCompraForm(request.POST)
@@ -103,7 +111,8 @@ def crear_compra(request):
         'compra_form': compra_form,
         'detalle_compra': detalle_compra_form
     })
-
+    
+@login_required
 def lista_compras(request):
     compras = OrdenCompra.objects.all()
     return render(request, 'inventario/compras/lista.html', {'compras': compras})
