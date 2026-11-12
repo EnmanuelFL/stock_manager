@@ -72,7 +72,7 @@ def crear_venta(request):
         detalle_form = DetalleFacturaForm(request.POST)
         if factura_form.is_valid() and detalle_form.is_valid():
             factura = factura_form.save(commit=False)
-            factura.usuario = Usuario.objects.first()
+            factura.usuario = request.user.usuario
             factura.save()
             detalle = detalle_form.save(commit=False)
             detalle.factura = factura
@@ -98,7 +98,7 @@ def crear_compra(request):
         detalle_compra_form = DetalleOrdenCompraForm(request.POST)
         if compra_form.is_valid() and detalle_compra_form.is_valid():
             compra = compra_form.save(commit=False)
-            compra.usuario = Usuario.objects.first()
+            compra.usuario = request.user.usuario
             compra.save()
             detalle_compra = detalle_compra_form.save(commit=False)
             detalle_compra.orden_compra = compra
