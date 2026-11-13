@@ -1,8 +1,9 @@
-from django.db.models.signals import post_save
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
 from django.db import transaction
 from .models import DetalleFactura, Devolucion, MovimientoInventario, DetalleOrdenCompra
+from decimal import Decimal
+
 
 @transaction.atomic
 @receiver(post_save, sender=DetalleFactura)
@@ -67,6 +68,7 @@ def guardar_estado_anterior(sender, instance, **kwargs):
             instance._estado_anterior = anterior.estado
         except Devolucion.DoesNotExist:
             instance._estado_anterior = None
+
 @receiver(post_save, sender=Devolucion)
 def procesar_devolucion(sender, instance, **kwargs):
     estado_anterior = getattr(sender, '_estado_anterior', None)
@@ -86,4 +88,22 @@ def procesar_devolucion(sender, instance, **kwargs):
                 motivo=f'devolucion de producto{instance.motivo}',
                 usuario=instance.usuario
             )
-    
+
+@receiver([post_save, post_delete], sender=DetalleFactura)
+def recalcular_total_factura(sender, instance, **kwargs):
+    factura = instance.factura
+    subtotal = Decimal('0')
+    for detalle in factura.detallefactura_set.all():
+        subtotal += detalle.cantidad * detalle.precio_unitario * (Decimal('1') - (detalle.descuento / Decimal('100')))
+    total = subtotal * (Decimal('1') + (factura.impuesto / Decimal('100')))
+    factura.total = round(total,2)
+    factura.save(update_fields=['total'])
+
+@receiver([post_save, post_delete], sender=DetalleOrdenCompra)
+def recalcular_total_compra(sender, instance, **kwargs):
+    orden = instance.orden_compra
+    subtotal = Decimal('0')
+    for detalle in orden.detalleordencompra_set.all():
+        subtotal += detalle.cantidad_solicitada * detalle.precio_unitario
+    orden.total = round(subtotal, 2)
+    orden.save(update_fields=['total'])
