@@ -15,11 +15,13 @@ def dashboard(request):
     resultado = FacturaVenta.objects.aggregate(total_ventas = Sum('total'))
     ingresos_totales = resultado['total_ventas'] or 0
     top_vendidos = Producto.objects.annotate(total_vendido = Sum('detallefactura__cantidad')).order_by('-total_vendido')[:5]
+    lista_bajo_stock = Producto.objects.filter(stock_actual__lte=F('stock_minimo'))
     contexto = {
         'total_productos': Producto.objects.count(),
         'productos_bajo_stock': Producto.objects.filter(stock_actual__lte=F('stock_minimo')).count(),
         'alertas_sin_resolver': AlertaStock.objects.filter(resuelta=False).count(),
         'ingresos_totales': ingresos_totales,
+        'lista_bajo_stock': lista_bajo_stock,
         'top_vendidos': top_vendidos,
     }
     return render(request, 'inventario/dashboard.html', contexto)
