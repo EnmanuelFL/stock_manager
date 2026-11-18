@@ -1,40 +1,101 @@
 {% extends 'inventario/base.html' %}
 
 {% block content %}
-<div class="card_productos">
-    <div class="total_productos">
-        <h5>Total Productos</h5>
-        <h2>{{ total_productos }}</h2>
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted">Total Productos</h6>
+                <h2>{{ total_productos }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted">Productos stock bajo</h6>
+                <h2 class="text-danger">{{ productos_bajo_stock }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted">Alertas sin resolver</h6>
+                <h2 class="text-warning">{{ alertas_sin_resolver }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted">Ingresos totales</h6>
+                <h2 class="text-success">{{ ingresos_totales }} €</h2>
+            </div>
+        </div>
     </div>
 </div>
-<div class="card_stock_bajo">
-     <div class="productos_stock_bajo">
-        <h5>Productos stock bajo</h5>
-        <h2>{{ productos_bajo_stock }}</h2>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-5">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Top 5 productos más vendidos</h5>
+                <ul class="list-group list-group-flush">
+                    {% for producto in top_vendidos %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ producto.nombre }}
+                        <span class="badge bg-primary rounded-pill">{{ producto.total_vendido|default:"0" }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-muted">Sin ventas registradas.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Ventas por producto</h5>
+                <canvas id="graficoTop"></canvas>
+            </div>
+        </div>
     </div>
 </div>
-<div class="card_alertas_sin_resolver">
-     <div class="alertas_sin_resolver">
-        <h5>Alertas sin resolver</h5>
-        <h2>{{ alertas_sin_resolver }}</h2>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h5 class="card-title text-danger mb-3">Productos con bajo stock</h5>
+        <table class="table table-striped table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>SKU</th>
+                    <th>Producto</th>
+                    <th>Stock actual</th>
+                    <th>Stock mínimo</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in lista_bajo_stock %}
+                <tr>
+                    <td>{{ producto.codigo_sku }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td><span class="badge bg-danger">{{ producto.stock_actual }}</span></td>
+                    <td>{{ producto.stock_minimo }}</td>
+                    <td>
+                        <a href="{% url 'editar_producto' producto.pk %}" class="btn btn-sm btn-outline-primary">Reponer</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No hay productos con stock bajo.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-</div>
-<div class="card_ingresos_totales">
-    <div class="ingresos_totales">
-        <h5>Ingresos totales</h5>
-        <h2>{{ ingresos_totales }}</h2>
-    </div>
-</div>
-<div class="card_top_5">
-    <h5>Top 5 productos más vendidos</h5>
-    <ul>
-        {% for producto in top_vendidos%}
-        <li>{{producto.nombre}} : {{producto.total_vendido|default:"0"}}</li>
-        {% endfor%}
-    </ul>
-</div>
-<div class="card_grafico_top_productos">
-    <canvas id="graficoTop"></canvas>
 </div>
 <script>
     const ctx = document.getElementById('graficoTop');
