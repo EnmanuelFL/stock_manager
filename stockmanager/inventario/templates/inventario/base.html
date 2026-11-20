@@ -4,34 +4,309 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <title>StockManager</title>
+    <style>
+        :root {
+            --bg-canvas: #F7F8FA;
+            --bg-surface: #FFFFFF;
+            --border-hairline: #E4E7EC;
+            --text-ink: #111827;
+            --text-muted: #6B7280;
+            --accent-indigo: #4F46E5;
+            --accent-indigo-soft: #EEF2FF;
+            --accent-cyan: #CAF0F8;
+            --accent-cyan-hover: #ADE8F4;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-canvas);
+            color: var(--text-ink);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6, .brand-name, .sidebar-link {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .app-shell {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .app-sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border-hairline);
+            padding: 1.25rem 0.85rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-lockup {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0 0.5rem;
+            margin-bottom: 1.5rem;
+            text-decoration: none;
+            color: var(--text-ink);
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background-color: var(--accent-indigo);
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .brand-name {
+            font-weight: 700;
+            font-size: 1.05rem;
+            letter-spacing: -0.02em;
+        }
+
+        .sidebar-section-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            padding: 0 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 0.75rem;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #4B5563;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+        .sidebar-link:hover {
+            background-color: #F3F4F6;
+            color: var(--text-ink);
+        }
+
+        .sidebar-link.active {
+            background-color: var(--accent-indigo-soft);
+            color: var(--accent-indigo);
+            font-weight: 600;
+        }
+
+        .app-main-area {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-topbar {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-hairline);
+            padding: 0.75rem 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-left: auto;
+        }
+
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background-color: #F3F4F6;
+            border: 1px solid var(--border-hairline);
+            color: var(--text-ink);
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-logout {
+            background-color: transparent;
+            border: 1px solid var(--border-hairline);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.35rem 0.75rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-logout:hover {
+            background-color: #F3F4F6;
+            color: var(--text-ink);
+        }
+
+        .app-content {
+            flex: 1;
+            padding: 1.5rem 1.75rem;
+            max-width: 1080px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .app-footer {
+            padding: 1rem 1.75rem;
+            max-width: 1080px;
+            width: 100%;
+            margin: 0 auto;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .mono-num {
+            font-family: 'Inter', sans-serif;
+            font-variant-numeric: tabular-nums;
+        }
+
+        @media (max-width: 991.98px) {
+            .app-shell {
+                flex-direction: column;
+            }
+            .app-sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-hairline);
+                padding: 1rem;
+            }
+            .sidebar-nav {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            .app-content, .app-topbar, .app-footer {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
-        <a class="navbar-brand" href="{% url 'dashboard' %}">StockManager</a>
-        <div class="navbar-nav me-auto">
-            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
-            <a class="nav-link" href="{% url 'lista_productos' %}">Productos</a>
-            <a class="nav-link" href="{% url 'lista_ventas' %}">Ventas</a>
-            <a class="nav-link" href="{% url 'lista_compras' %}">Compras</a>
-        </div>
+    <div class="app-shell">
+        {% if user.is_authenticated %}
+        <aside class="app-sidebar">
+            <a href="{% url 'dashboard' %}" class="brand-lockup">
+                <span class="brand-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                </span>
+                <span class="brand-name">StockManager</span>
+            </a>
 
-        <div class="d-flex align-items-center gap-3">
-            {% if user.is_authenticated %}
-                <span class="text-light small">Usuario: {{ user.username }}</span>
-                <form method="post" action="{% url 'logout' %}" class="mb-0">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-light btn-sm">Cerrar sesión</button>
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm">Iniciar sesión</a>
-            {% endif %}
+            <div class="sidebar-section-label">Gestión</div>
+            <nav class="sidebar-nav">
+                <a href="{% url 'dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="{% url 'lista_productos' %}" class="sidebar-link {% if 'producto' in request.resolver_match.url_name %}active{% endif %}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    </svg>
+                    Productos
+                </a>
+                <a href="{% url 'lista_ventas' %}" class="sidebar-link {% if 'venta' in request.resolver_match.url_name %}active{% endif %}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                    Ventas
+                </a>
+                <a href="{% url 'lista_compras' %}" class="sidebar-link {% if 'compra' in request.resolver_match.url_name %}active{% endif %}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    Compras
+                </a>
+            </nav>
+        </aside>
+        {% endif %}
+
+        <div class="app-main-area">
+            <header class="app-topbar">
+                {% if not user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="brand-lockup mb-0">
+                    <span class="brand-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        </svg>
+                    </span>
+                    <span class="brand-name">StockManager</span>
+                </a>
+                {% endif %}
+
+                <div class="topbar-user">
+                    {% if user.is_authenticated %}
+                        <span class="fw-semibold small">{{ user.username }}</span>
+                        <span class="user-avatar">{{ user.username|slice:":2"|upper }}</span>
+                        <form method="post" action="{% url 'logout' %}" class="mb-0">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-logout">Cerrar sesión</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn-logout text-decoration-none">Iniciar sesión</a>
+                    {% endif %}
+                </div>
+            </header>
+
+            <main class="app-content">
+                {% block content %}{% endblock %}
+            </main>
+
+            <footer class="app-footer">
+                StockManager &middot; Espacio de trabajo de Operaciones
+            </footer>
         </div>
-    </nav>
-    <main class="container my-4">
-        {% block content %} {% endblock %}
-    </main>
+    </div>
 </body>
 </html>
