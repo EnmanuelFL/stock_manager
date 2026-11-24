@@ -1,7 +1,8 @@
 from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
 from django.db import transaction
-from .models import DetalleFactura, Devolucion, MovimientoInventario, DetalleOrdenCompra
+from django.utils import timezone
+from .models import DetalleFactura, Devolucion, MovimientoInventario, DetalleOrdenCompra, Producto, AlertaStock
 from decimal import Decimal
 
 
@@ -107,3 +108,27 @@ def recalcular_total_compra(sender, instance, **kwargs):
         subtotal += detalle.cantidad_solicitada * detalle.precio_unitario
     orden.total = round(subtotal, 2)
     orden.save(update_fields=['total'])
+
+@receiver(post_save, sender=Producto)
+def gestionar_alerta_stock(sender, instance, **kwargs):
+    if instance.stock_actual <= 0:
+        tipo = AlertaStock.TipoAlertaChoices.SIN_STOCK
+    elif instance.stock_actual <= instance.stock_minimo:
+        tipo = AlertaStock.TipoAlertaChoices.STOCK_BAJO
+    elif instance.stock_actual > instance.stock_maximo:
+        tipo = AlertaStock.TipoAlertaChoices.SOBRE_STOCK
+    else:
+        tipo = None
+
+    if tipo is None:
+        AlertaStock.objects.filter(producto=instance, resuelta=False).update(
+            resuelta=True,
+            fecha_resolución=timezone.now()
+        )
+    else:
+        AlertaStock.objects.filter(producto=instance, resuelta=False).exclude(tipo_alerta=tipo).update(
+            resuelta=True,
+            fecha_resolución=timezone.now()
+        )
+        if not AlertaStock.objects.filter(producto=instance, tipo_alerta=tipo, resuelta=False).exists():
+            AlertaStock.objects.create(producto=instance, tipo_alerta=tipo)

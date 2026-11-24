@@ -9,6 +9,7 @@ from .forms import (
     OrdenCompraForm,
     DetalleOrdenCompraForm)
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 
 @login_required
 def dashboard(request):
@@ -68,6 +69,7 @@ def eliminar_producto(request, pk):
     return render(request, 'inventario/productos/eliminar.html', {'producto': producto})
 
 @login_required
+@transaction.atomic
 def crear_venta(request):
     if request.method == 'POST':
         factura_form = FacturaVentaForm(request.POST)

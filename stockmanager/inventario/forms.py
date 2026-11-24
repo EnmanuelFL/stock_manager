@@ -15,7 +15,16 @@ class DetalleFacturaForm(forms.ModelForm):
     class Meta:
         model = DetalleFactura
         fields = ['producto', 'cantidad', 'precio_unitario', 'descuento']
-
+    def clean(self):
+        cleaned_data = super().clean()
+        producto = cleaned_data.get('producto')
+        cantidad = cleaned_data.get('cantidad')
+        if producto and cantidad is not None:
+            if cantidad <= 0:
+                self.add_error('cantidad', 'La cantidad debe ser mayor que 0.')
+            if cantidad > producto.stock_actual:
+                self.add_error('cantidad', f'Stock insuficiente. Disponible {producto.stock_actual}')
+        return cleaned_data
 class OrdenCompraForm(forms.ModelForm):
     class Meta:
         model = OrdenCompra
